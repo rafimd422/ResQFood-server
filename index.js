@@ -1,16 +1,13 @@
 const express = require("express");
 const cors = require("cors");
 const port = process.env.PORT || 5000;
-require('dotenv').config()
-
+require("dotenv").config();
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-
-
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion } = require("mongodb");
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.sopxnju.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -19,7 +16,7 @@ const client = new MongoClient(uri, {
     version: ServerApiVersion.v1,
     strict: true,
     deprecationErrors: true,
-  }
+  },
 });
 
 async function run() {
@@ -30,17 +27,23 @@ async function run() {
     const database = client.db("FoodDB");
     const foodCollection = database.collection("foods");
 
+    app.get("/foods", async (req, res) => {
+      const cursor = foodCollection.find();
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
-app.post('/foods', async(req, res)=> {
-    const food = req.body;
-    const result = foodCollection.insertOne(food)
-    res.send(result)
-})
-
+    app.post("/foods", async (req, res) => {
+      const food = req.body;
+      const result = await foodCollection.insertOne(food);
+      res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } finally {
     // Ensures that the client will close when you finish/error
     // await client.close();
@@ -48,14 +51,10 @@ app.post('/foods', async(req, res)=> {
 }
 run().catch(console.dir);
 
-
 app.get("/", (req, res) => {
-    res.send("Server is running...");
-  });
-  
-  
+  res.send("Server is running...");
+});
+
 app.listen(port, () => {
-    console.log(`Server is Running on port ${port}`);
-  });
-  
-  
+  console.log(`Server is Running on port ${port}`);
+});
