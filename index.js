@@ -26,6 +26,7 @@ async function run() {
 
     const database = client.db("FoodDB");
     const foodCollection = database.collection("foods");
+    const reqFoodCollection = database.collection("reqfoods");
 
     app.get("/foods", async (req, res) => {
       let query = {};
@@ -83,6 +84,16 @@ async function run() {
       const result = await foodCollection.deleteOne(query)
       res.send(result)
     })
+
+
+// apis for requested foods Collections 
+
+
+app.post("/reqfoods", async (req, res) => {
+  const food = req.body;
+  const result = await reqFoodCollection.insertOne(food);
+  res.send(result);
+});
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
