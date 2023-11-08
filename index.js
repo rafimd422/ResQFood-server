@@ -95,6 +95,18 @@ app.post("/reqfoods", async (req, res) => {
   res.send(result);
 });
 
+app.get("/reqfoods", async (req, res) => {
+  let query = {};
+  if (req.query.requesterEmail) {
+    query = { email: req.query.requesterEmail };
+  }
+  const cursor = reqFoodCollection.find(query);
+  const result = await cursor.toArray();
+  res.send(result);
+});
+
+
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
