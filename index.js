@@ -39,12 +39,41 @@ async function run() {
       res.send(result);
     });
     
+    app.get('/foods/:id', async (req, res) => {
+      const id = req.params.id
+      const Query = {_id: new ObjectId(id)}
+      console.log(Query)
+      const result = await foodCollection.findOne(Query)
+      res.send(result)
+    })
 
     app.post("/foods", async (req, res) => {
       const food = req.body;
       const result = await foodCollection.insertOne(food);
       res.send(result);
     });
+
+
+
+    app.put('/foods/:id',async(req,res) => {
+      const id = req.params.id
+      const foods = req.body;
+      const filter = {_id: new ObjectId(id)}
+      const options = { upsert: true };
+      const updateFood = {
+        $set: {
+          foodName: foods.foodName,
+          foodImg: foods.foodImg,
+          status:foods.status,
+          quantity:foods.quantity,
+          pickUplocation: foods.pickUplocation,
+          expireDate:foods.expireDate,
+          note: foods.note
+        }
+      }
+      const result = await foodCollection.updateOne(filter,options,updateFood)
+      res.send(result)
+    })
 
     app.delete('/foods/:id',async(req,res) => {
       const id = req.params.id;
