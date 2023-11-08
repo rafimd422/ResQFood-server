@@ -29,11 +29,9 @@ async function run() {
 
     app.get("/foods", async (req, res) => {
       let query = {};
-    
       if (req.query.email) {
         query = { email: req.query.email };
       }
-    
       const cursor = foodCollection.find(query);
       const result = await cursor.toArray();
       res.send(result);
@@ -54,14 +52,12 @@ async function run() {
     });
 
 
-
-    app.put('/foods/:id',async(req,res) => {
+    app.put('/foods/:id', async(req,res) => {
       const id = req.params.id
       const foods = req.body;
       const filter = {_id: new ObjectId(id)}
       const options = { upsert: true };
-      const updateFood = {
-        $set: {
+      const updateFood = { $set: {
           foodName: foods.foodName,
           foodImg: foods.foodImg,
           status:foods.status,
@@ -71,8 +67,13 @@ async function run() {
           note: foods.note
         }
       }
-      const result = await foodCollection.updateOne(filter,options,updateFood)
-      res.send(result)
+      try {
+        const result = await foodCollection.updateOne(filter,updateFood, options);
+        res.send(result);
+      } catch (error) {
+        console.error(error);
+        res.status(500).send('An error occurred while updating the document.');
+      }
     })
 
     app.delete('/foods/:id',async(req,res) => {
