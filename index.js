@@ -97,8 +97,8 @@ app.post("/reqfoods", async (req, res) => {
 
 app.get("/reqfoods", async (req, res) => {
   let query = {};
-  if (req.query.requesterEmail) {
-    query = { email: req.query.requesterEmail };
+  if (req.query?.email) {
+    query = { requesterEmail: req.query.email }; // Use requesterEmail here
   }
   const cursor = reqFoodCollection.find(query);
   const result = await cursor.toArray();
@@ -106,6 +106,28 @@ app.get("/reqfoods", async (req, res) => {
 });
 
 
+app.get('/reqfoods/:id', async (req, res) => {
+  const id = req.params.id
+  const Query = {id: id}
+  console.log(Query)
+  const result = await reqFoodCollection.findOne(Query)
+  res.send(result)
+})
+
+app.patch('/reqfoods/:id', async (req, res) => {
+  const id = req.params.id
+  const filter = {_id: new ObjectId(id)}
+  console.log(id, filter)
+  const reqFoods = req.body;
+  console.log('status', reqFoods)
+  const updateDoc = {
+    $set: {
+      status: reqFoods.status
+    }
+  }
+  const result = await reqFoodCollection.updateOne(filter, updateDoc)
+  res.send(result)
+})
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
